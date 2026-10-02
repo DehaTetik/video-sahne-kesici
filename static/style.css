@@ -1,0 +1,114 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f1220;
+  --card: #1a1f35;
+  --accent: #6c5ce7;
+  --accent-2: #00cec9;
+  --text: #e8ecff;
+  --muted: #8a93b8;
+  --danger: #ff6b6b;
+  --radius: 14px;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at top, #1a1f35, #0f1220 70%);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 30px 16px 80px;
+}
+
+.container { max-width: 1000px; margin: 0 auto; }
+
+header { text-align: center; margin-bottom: 28px; }
+h1 { font-size: 2.2rem; background: linear-gradient(90deg, var(--accent), var(--accent-2));
+     -webkit-background-clip: text; background-clip: text; color: transparent; }
+.subtitle { color: var(--muted); margin-top: 6px; }
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  margin-bottom: 22px;
+  border: 1px solid rgba(255,255,255,.05);
+}
+
+.file-input { display: inline-block; cursor: pointer; }
+.file-input input { display: none; }
+.file-input span {
+  display: inline-block; padding: 12px 22px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), #a29bfe);
+  font-weight: 600; transition: transform .15s;
+}
+.file-input span:hover { transform: translateY(-2px); }
+.file-name { color: var(--muted); margin-top: 10px; font-size: .92rem; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
+.field label { display: block; margin-bottom: 8px; font-size: .92rem; color: var(--muted); }
+.field input[type=range] { width: 100%; accent-color: var(--accent); }
+
+button {
+  width: 100%; padding: 14px; border: none; border-radius: 10px;
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff; transition: transform .15s, filter .15s;
+}
+button:hover { transform: translateY(-2px); filter: brightness(1.1); }
+button:disabled { opacity: .6; cursor: not-allowed; }
+
+.loader { text-align: center; padding: 30px; color: var(--muted); }
+.spinner {
+  width: 46px; height: 46px; margin: 0 auto 14px;
+  border: 4px solid rgba(255,255,255,.15);
+  border-top-color: var(--accent-2);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: center; }
+.stats > div { background: rgba(255,255,255,.03); border-radius: 10px; padding: 14px; }
+.stat-label { display: block; font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.stats span:last-child { font-size: 1.35rem; font-weight: 700; color: var(--accent-2); }
+
+h2 { margin: 26px 0 12px; font-size: 1.2rem; }
+.cut-list { display: flex; flex-direction: column; gap: 8px; }
+.cut-item {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: var(--card); padding: 12px 16px; border-radius: 10px;
+  border-left: 4px solid var(--accent-2);
+  font-size: .95rem;
+}
+.badge {
+  background: var(--accent); color: #fff; padding: 3px 9px;
+  border-radius: 20px; font-size: .78rem; font-weight: 700;
+}
+.score { margin-left: auto; color: var(--muted); font-size: .85rem; }
+
+.frame-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.frame {
+  display: block; background: var(--card); border-radius: 10px;
+  overflow: hidden; text-decoration: none; color: var(--text);
+  transition: transform .15s;
+}
+.frame:hover { transform: translateY(-3px); }
+.frame img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+.frame span { display: block; padding: 8px; font-size: .78rem; color: var(--muted); word-break: break-all; }
+
+.hidden { display: none !important; }
+.muted { color: var(--muted); font-style: italic; }
+
+.error {
+  background: rgba(255,107,107,.12); border: 1px solid var(--danger);
+  color: #ffb3b3; padding: 14px; border-radius: 10px; margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .grid, .stats { grid-template-columns: 1fr 1fr; }
+  h1 { font-size: 1.6rem; }
+}
