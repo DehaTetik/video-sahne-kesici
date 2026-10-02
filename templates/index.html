@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Sahne Kesici</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Video Sahne Kesici</h1>
+      <p class="subtitle">
+        Iki kare arasindaki <strong>mutlak fark</strong> ile kamera kesmelerini bulur.
+      </p>
+    </header>
+
+    <form id="uploadForm" class="card">
+      <label class="file-input">
+        <input type="file" id="videoInput" name="video"
+               accept="video/mp4,video/x-msvideo,video/quicktime,video/webm,video/x-matroska"
+               required />
+        <span>Video Sec</span>
+      </label>
+      <div id="fileName" class="file-name">Dosya secilmedi</div>
+
+      <div class="grid">
+        <div class="field">
+          <label for="threshold">Esik (0-255): <span id="thVal">30</span></label>
+          <input type="range" id="threshold" name="threshold"
+                 min="5" max="100" value="30" step="1" />
+        </div>
+        <div class="field">
+          <label for="min_duration">Min Sahne Suresi (sn): <span id="mdVal">0.5</span></label>
+          <input type="range" id="min_duration" name="min_duration"
+                 min="0.1" max="3" value="0.5" step="0.1" />
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn">Analiz Et</button>
+    </form>
+
+    <div id="loader" class="loader hidden">
+      <div class="spinner"></div>
+      <p>Video isleniyor, lutfen bekleyin...</p>
+    </div>
+
+    <div id="result" class="hidden">
+      <div class="card stats">
+        <div><span class="stat-label">FPS</span><span id="sFps">-</span></div>
+        <div><span class="stat-label">Sure</span><span id="sDur">-</span></div>
+        <div><span class="stat-label">Toplam Kare</span><span id="sTotal">-</span></div>
+        <div><span class="stat-label">Kesme Sayisi</span><span id="sCuts">-</span></div>
+      </div>
+
+      <h2>Kesme Noktalari</h2>
+      <div id="cutList" class="cut-list"></div>
+
+      <h2>Yakalanan Kareler</h2>
+      <div id="frameGrid" class="frame-grid"></div>
+    </div>
+
+    <div id="errorBox" class="error hidden"></div>
+  </div>
+
+  <script>
+    const form      = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('videoInput');
+    const fileName  = document.getElementById('fileName');
+    const loader    = document.getElementById('loader');
+    const resultEl  = document.getElementById('result');
+    const errorBox  = document.getElementById('errorBox');
+
+    document.getElementById('threshold').addEventListener('input', e => {
+      document.getElementById('thVal').textContent = e.target.value;
+    });
+    document.getElementById('min_duration').addEventListener('input', e => {
+      document.getElementById('mdVal').textContent = e.target.value;
+    });
+
+    fileInput.addEventListener('change', () => {
+      fileName.textContent = fileInput.files[0]
+        ? fileInput.files[0].name
+        : 'Dosya secilmedi';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!fileInput.files[0]) return;
+
+      errorBox.classList.add('hidden');
+      resultEl.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      const fd = new FormData();
+      fd.append('video', fileInput.files[0]);
+      fd.append('threshold', document.getElementById('threshold').value);
+      fd.append('min_duration', document.getElementById('min_duration').value);
+
+      try {
+        const res  = await fetch('/detect', { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.error || 'Bilinmeyen hata');
+
+        document.getElementById('sFps').textContent   = data.fps;
+        document.getElementById('sDur').textContent   = data.duration + ' sn';
+        document.getElementById('sTotal').textContent = data.total_frames;
+        document.getElementById('sCuts').textContent  = data.cut_count;
+
+        const list = document.getElementById('cutList');
+        list.innerHTML = data.cuts.length === 0
+          ? '<p class="muted">Hic kesme bulunamadi. Esigi dusurmeyi deneyin.</p>'
+          : data.cuts.map((c, i) => `
+              <div class="cut-item">
+                <span class="badge">#${i + 1}</span>
+                <span>Kare <b>${c.frame}</b></span>
+                <span>${c.timestamp.toFixed(3)} sn</span>
+                <span class="score">Skor: ${c.score.toFixed(2)}</span>
+              </div>`).join('');
+
+        const grid = document.getElementById('frameGrid');
+        grid.innerHTML = data.frames.length === 0
+          ? '<p class="muted">Kaydedilmis kare yok.</p>'
+          : data.frames.map(f => `
+              <a class="frame" href="${f.url}" target="_blank">
+                <img src="${f.url}" alt="${f.name}" loading="lazy" />
+                <span>${f.name}</span>
+              </a>`).join('');
+
+        resultEl.classList.remove('hidden');
+      } catch (err) {
+        errorBox.textContent = 'Hata: ' + err.message;
+        errorBox.classList.remove('hidden');
+      } finally {
+        loader.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
