@@ -1,0 +1,49 @@
+# Video Sahne Kesici (Scene Cut Detector)
+
+Video dosyalarini zaman boyutlu bir matris dizisi olarak ele alan,
+ardisik iki kare arasindaki mutlak farki (absolute difference) hesaplayarak
+kamera acisinin / sahnenin degistigi anlari (cut) otomatik tespit eden
+Python + OpenCV + Flask projesi.
+
+## Gereksinimler
+
+- Python 3.12 / 3.13 / 3.14
+- Windows / macOS / Linux
+
+## Kurulum
+
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1        # Windows PowerShell
+    # source venv/bin/activate         # macOS / Linux
+
+    python -m pip install --upgrade pip setuptools wheel
+    pip install -r requirements.txt
+
+## Kullanim
+
+### CLI
+
+    python main.py cli video.mp4
+    python main.py cli video.mp4 --threshold 25 --min-duration 0.8
+
+### Web
+
+    python main.py web
+    # Tarayicida: http://127.0.0.1:5000
+
+## Proje Yapisi
+
+    video-scene-cut-detector/
+    |-- main.py
+    |-- app.py
+    |-- scene_cut_detector.py
+    |-- requirements.txt
+    |-- README.md
+    |-- templates/index.html
+    |-- static/style.css
+    |-- uploads/
+    |-- output/
+
+## Lisans
+
+MIT
